@@ -1,0 +1,32 @@
+{
+  "resource": "/read_employee",
+  "path": "/read_employee",
+  "httpMethod": "GET",
+  "isBase64Encoded": false,
+  "queryStringParameters": {
+    "id_employee": "123"
+  },
+  "pathParameters": null,
+  "stageVariables": null,
+  "headers": {
+    "Accept": "application/json",
+    "Content-Type": "application/json"
+  },
+  "requestContext": {
+    "accountId": "123456789012",
+    "resourceId": "resourceId",
+    "stage": "prod",
+    "requestId": "requestId",
+    "requestTime": "09/Apr/2021:12:34:56 +0000",
+    "requestTimeEpoch": 1617965696000,
+    "identity": {
+      "sourceIp": "127.0.0.1",
+      "userAgent": "PostmanRuntime/7.28.4"
+    },
+    "path": "/read_employee",
+    "resourcePath": "/read_employee",
+    "httpMethod": "GET",
+    "apiId": "apiId",
+    "protocol": "HTTP/1.1"
+  }
+}

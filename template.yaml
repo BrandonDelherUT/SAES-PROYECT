@@ -1,0 +1,145 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  SAES
+
+  Sample SAM Template for SAES
+
+Globals:
+  Function:
+    Timeout: 5
+    MemorySize: 128
+    Tracing: Active
+    LoggingConfig:
+      LogFormat: JSON
+  Api:
+    TracingEnabled: true
+
+Resources:
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: SecretsManagerAccessPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource: '*'
+        - PolicyName: MySQLAccessPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - rds-db:connect
+                Resource: '*'
+        - PolicyName: CloudWatchLogsPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: 'arn:aws:logs:*:*:*'
+
+  DeleteEmployeeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: delete_employee/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Architectures:
+        - x86_64
+      Events:
+        DeleteEmployee:
+          Type: Api
+          Properties:
+            Path: /delete_employee
+            Method: delete
+
+  CreateEmployeeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: create_employee/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Architectures:
+        - x86_64
+      Events:
+        CreateEmployee:
+          Type: Api
+          Properties:
+            Path: /create_employee
+            Method: post
+
+  ReadEmployeeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: read_employee/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Architectures:
+        - x86_64
+      Events:
+        ReadEmployee:
+          Type: Api
+          Properties:
+            Path: /read_employee
+            Method: get
+
+  UpdateEmployeeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: update_employee/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Architectures:
+        - x86_64
+      Events:
+        UpdateEmployee:
+          Type: Api
+          Properties:
+            Path: /update_employee
+            Method: put
+
+Outputs:
+  DeleteEmployeeApi:
+    Description: "API Gateway endpoint URL for DeleteEmployee function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/delete_employee/"
+  CreateEmployeeApi:
+    Description: "API Gateway endpoint URL for CreateEmployee function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/create_employee/"
+  ReadEmployeeApi:
+    Description: "API Gateway endpoint URL for ReadEmployee function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/read_employee/"
+  UpdateEmployeeApi:
+    Description: "API Gateway endpoint URL for UpdateEmployee function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/update_employee/"
+  DeleteEmployeeFunctionArn:
+    Description: "Delete Employee Lambda Function ARN"
+    Value: !GetAtt DeleteEmployeeFunction.Arn
+  CreateEmployeeFunctionArn:
+    Description: "Create Employee Lambda Function ARN"
+    Value: !GetAtt CreateEmployeeFunction.Arn
+  ReadEmployeeFunctionArn:
+    Description: "Read Employee Lambda Function ARN"
+    Value: !GetAtt ReadEmployeeFunction.Arn
+  UpdateEmployeeFunctionArn:
+    Description: "Update Employee Lambda Function ARN"
+    Value: !GetAtt UpdateEmployeeFunction.Arn
